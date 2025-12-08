@@ -6,6 +6,19 @@ import { firstValueFrom } from 'rxjs';
 export class AuthController {
   constructor(@Inject('AUTH_SERVICE') private readonly client: ClientProxy) {}
 
+  @Post('register')
+  async register(@Body() body: any) {
+    try {
+      const result = await firstValueFrom(
+        this.client.send({ cmd: 'register' }, body),
+      );
+      return result;
+    } catch (error) {
+      console.error('Error in register:', error);
+      throw error;
+    }
+  }
+
   @Post('login')
   async login(@Body() body: any) {
     try {

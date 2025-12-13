@@ -4,9 +4,10 @@ import { PriceComparatorController } from '@/price-comparator/price-comparator.c
 import { SalesController } from '@/sales/sales.controller';
 import { ClientsConfigModule } from './common/clients-config.module';
 import { AuthModule } from '@/auth/auth.module';
+import { GescomModule } from '@/gescom-data-access/gescom-data-access.module';
 
 @Module({
-  imports: [ClientsConfigModule, AuthModule],
+  imports: [ClientsConfigModule, AuthModule, GescomModule],
   controllers: [AuthController, PriceComparatorController, SalesController],
   providers: [],
 })

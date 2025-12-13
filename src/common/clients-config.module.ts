@@ -12,6 +12,14 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
           port: parseInt(process.env.REDIS_PORT || '6379'),
         },
       },
+      {
+        name: 'GESCOM_SERVICE',
+        transport: Transport.REDIS,
+        options: {
+          host: process.env.REDIS_HOST || 'redis',
+          port: parseInt(process.env.REDIS_PORT || '6379'),
+        },
+      },
     ]),
   ],
   exports: [ClientsModule],

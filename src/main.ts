@@ -10,6 +10,6 @@ async function bootstrap() {
 
   await app.listen(3000);
 
-  console.log(`API Gateway está corriendo: localhost:3000/api/v1`);
+  console.log(`API Gateway está corriendo: localhost:3000/api/v1...`);
 }
 bootstrap();

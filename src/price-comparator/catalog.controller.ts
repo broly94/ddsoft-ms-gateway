@@ -64,4 +64,7 @@ export class CatalogController {
       ),
     );
   }
+
+  @Post('process-re-ranking')
+  async processReRanking(@Body() body: any) {}
 }

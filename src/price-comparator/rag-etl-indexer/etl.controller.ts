@@ -2,7 +2,7 @@ import { Controller, Post, Inject, OnModuleInit } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 
-@Controller('price-comparator/etl')
+@Controller('rag-etl-indexer')
 export class EtlController implements OnModuleInit {
   constructor(
     @Inject('RAG_ETL_INDEXER_SERVICE')

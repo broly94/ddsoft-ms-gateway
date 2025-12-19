@@ -11,9 +11,9 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import { ProcessImageAndSearchDto } from '@/price-comparator/catalog-processing.dto';
+import { ProcessImageAndSearchDto } from '@/price-comparator/rag-ia-backend/dto/catalog-processing.dto';
 
-@Controller('catalog')
+@Controller('rag-backend')
 export class CatalogController {
   private readonly logger = new Logger(CatalogController.name);
 
@@ -66,5 +66,29 @@ export class CatalogController {
   }
 
   @Post('process-re-ranking')
-  async processReRanking(@Body() body: any) {}
+  async processReRanking(@Body() body: { query: string; limit?: number }) {
+    this.logger.log(
+      `Gateway: Received re-ranking request for re-ranking. Sending to rag_ia_backend service.`,
+    );
+
+    return await firstValueFrom(
+      this.ragIaBackendClient.send({ cmd: 'rerank_product_matches' }, body),
+    );
+  }
+
+  @Post('manual-product-search')
+  async manualProductSearch(@Body() body: any) {
+    this.logger.log(`Gateway: Sending manual search for query: ${body.query}`);
+
+    return await firstValueFrom(
+      this.ragIaBackendClient.send(
+        { cmd: 'manual_product_search' },
+        // Enviamos el objeto plano
+        {
+          query: body.query,
+          limit: body.limit || 5,
+        },
+      ),
+    );
+  }
 }

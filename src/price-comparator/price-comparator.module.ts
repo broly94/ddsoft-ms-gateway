@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { EtlController } from './etl.controller';
-import { CatalogController } from './catalog.controller';
+import { EtlController } from '@/price-comparator/rag-etl-indexer/etl.controller';
+import { CatalogController } from '@/price-comparator/rag-ia-backend/catalog.controller';
 
 @Module({
   imports: [

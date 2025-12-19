@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PriceComparatorModule } from './price-comparator/price-comparator.module';
+import { PriceComparatorModule } from '@/price-comparator/price-comparator.module';
 
 @Module({
   imports: [

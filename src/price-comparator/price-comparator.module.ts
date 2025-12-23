@@ -2,9 +2,18 @@ import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { EtlController } from '@/price-comparator/rag-etl-indexer/etl.controller';
 import { CatalogController } from '@/price-comparator/rag-ia-backend/catalog.controller';
+import { HttpModule } from '@nestjs/axios';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    HttpModule.register({
+      timeout: 30000,
+      maxRedirects: 5,
+    }),
     ClientsModule.register([
       {
         name: 'RAG_IA_BACKEND_SERVICE',
@@ -25,6 +34,6 @@ import { CatalogController } from '@/price-comparator/rag-ia-backend/catalog.con
     ]),
   ],
   controllers: [EtlController, CatalogController],
-  providers: [],
+  providers: [ConfigService],
 })
 export class PriceComparatorModule {}

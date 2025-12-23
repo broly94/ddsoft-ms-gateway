@@ -6,4 +6,4 @@ import { ClientsConfigModule } from '@/common/clients-config.module';
   imports: [ClientsConfigModule],
   controllers: [GescomController],
 })
-export class GescomModule {}
+export class GescomDataAccessModule {}

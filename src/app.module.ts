@@ -1,14 +1,22 @@
 import { Module } from '@nestjs/common';
 import { PriceComparatorModule } from '@/price-comparator/price-comparator.module';
+import { CronModule } from '@/cron/cron.module';
+import { AuthModule } from '@/auth/auth.module';
+import { GescomDataAccessModule } from './gescom-data-access/gescom-data-access.module';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
-    // Otros módulos que puedas tener
+    HttpModule.register({
+      timeout: 30000,
+      maxRedirects: 5,
+    }),
+    CronModule,
+    AuthModule,
+    GescomDataAccessModule,
     PriceComparatorModule,
   ],
   controllers: [],
-  providers: [
-    // Proveedores globales si los hubiera
-  ],
+  providers: [],
 })
 export class AppModule {}

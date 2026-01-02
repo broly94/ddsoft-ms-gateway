@@ -10,13 +10,13 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
+import { ClientProxy } from '@nestjs/microservices';
 import { RegisterDto } from '@/auth/dto/register.dto';
 import { UpdateUserDto } from '@/auth/dto/update.dto';
-import { AuthGuard } from './guards/auth.guard';
-import { RolesGuard } from './guards/roles.guard';
-import { Roles } from './decorators/roles.decorator';
+import { AuthGuard } from '@/auth/guards/auth.guard';
+import { RolesGuard } from '@/auth/guards/roles.guard';
+import { Roles } from '@/auth/decorators/roles.decorator';
 import { UserRole } from '@/common/users/roles';
 
 @UseInterceptors(RpcExceptionInterceptor)
@@ -24,8 +24,8 @@ import { UserRole } from '@/common/users/roles';
 export class AuthController {
   constructor(@Inject('AUTH_SERVICE') private readonly client: ClientProxy) {}
 
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.SUPERVISOR, UserRole.ADMIN)
+  // @UseGuards(RolesGuard)
+  // @Roles(UserRole.SUPERVISOR, UserRole.ADMIN)
   @Post('register')
   async register(@Body() body: RegisterDto) {
     return await firstValueFrom(this.client.send({ cmd: 'register' }, body));
@@ -42,6 +42,7 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() body: any) {
+    console.log(body);
     return await firstValueFrom(this.client.send({ cmd: 'login' }, body));
   }
 

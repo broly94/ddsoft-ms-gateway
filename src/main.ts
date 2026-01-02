@@ -4,6 +4,9 @@ import { RpcExceptionFilter } from '@/common/filters/rpc-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.enableCors();
+
   app.setGlobalPrefix('api/v1');
 
   app.useGlobalFilters(new RpcExceptionFilter());

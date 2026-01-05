@@ -323,6 +323,8 @@ export class CatalogController {
     );
   }
 
+
+
   @Get('health-check')
   async healthCheck() {
     return {

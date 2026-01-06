@@ -5,14 +5,18 @@ import { RpcExceptionFilter } from '@/common/filters/rpc-exception.filter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.enableCors();
+  app.enableCors({
+    origin: '*', // Para pruebas con Postman
+    methods: ['GET', 'POST'],
+    credentials: false,
+  });
 
   app.setGlobalPrefix('api/v1');
 
   app.useGlobalFilters(new RpcExceptionFilter());
 
-  await app.listen(3000);
+  await app.listen(3000, '0.0.0.0');
 
-  console.log(`API Gateway está corriendo: localhost:3000/api/v1...`);
+  console.log(`API Gateway está corriendo: 0.0.0.0:3000/api/v1...`);
 }
 bootstrap();

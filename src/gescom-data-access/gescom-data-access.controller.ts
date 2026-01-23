@@ -1,4 +1,4 @@
-import { Controller, Get, Inject, Logger, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Inject, Logger, BadRequestException, Param } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 
@@ -38,6 +38,32 @@ export class GescomController {
       throw new BadRequestException(
         'Error al obtener vendedores de gescom-data-access.',
       );
+    }
+  }
+
+  @Get('search-seller/:id')
+  async searchSeller(@Param('id') id: string) {
+    try {
+      this.logger.log(`Gateway: Buscando vendedor ${id} en Gescom`);
+      return await firstValueFrom(
+        this.client.send({ cmd: 'search_seller' }, { id })
+      );
+    } catch (error) {
+      this.logger.error(`Error buscando vendedor: ${error.message}`);
+      throw new BadRequestException('Error al buscar vendedor en Gescom.');
+    }
+  }
+
+  @Get('search-client/:id')
+  async searchClient(@Param('id') id: string) {
+    try {
+      this.logger.log(`Gateway: Buscando cliente ${id} en Gescom`);
+      return await firstValueFrom(
+        this.client.send({ cmd: 'search_client' }, { id })
+      );
+    } catch (error) {
+      this.logger.error(`Error buscando cliente: ${error.message}`);
+      throw new BadRequestException('Error al buscar cliente en Gescom.');
     }
   }
 }

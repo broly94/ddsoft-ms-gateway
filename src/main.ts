@@ -3,7 +3,14 @@ import { AppModule } from '@/app.module';
 import { RpcExceptionFilter } from '@/common/filters/rpc-exception.filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    bodyParser: true,
+    rawBody: true,
+  });
+
+  // Aumentar el límite de tamaño del body para archivos grandes (50MB)
+  app.use(require('body-parser').json({ limit: '50mb' }));
+  app.use(require('body-parser').urlencoded({ limit: '50mb', extended: true }));
 
   app.enableCors({
     origin: '*', // Para pruebas con Postman

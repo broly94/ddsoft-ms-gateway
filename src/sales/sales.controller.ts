@@ -213,6 +213,82 @@ export class SalesController {
     }
   }
 
+  @Get('route-validator/history/:batchId/details')
+  async getBatchDetails(@Param('batchId') batchId: string) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.salesServiceUrl}/route-validator/history/${batchId}/details`),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error getting batch details: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('route-validator/history/:batchId/hours')
+  async getBatchHours(@Param('batchId') batchId: string) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.salesServiceUrl}/route-validator/history/${batchId}/hours`),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error getting batch hours: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('route-validator/frecuencia/recent')
+  async getRecentFrecuencia(
+    @Query('limit') limit?: number,
+    @Query('vendedor') vendedor?: string,
+    @Query('cliente') cliente?: string,
+    @Query('batch_id') batch_id?: string,
+  ) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.salesServiceUrl}/route-validator/frecuencia/recent`, {
+          params: { limit, vendedor, cliente, batch_id }
+        }),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error getting recent frecuencia: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('route-validator/frecuencia/summary')
+  async getFrecuenciaSummary(
+    @Query('vendedor') vendedor?: string,
+    @Query('batch_id') batch_id?: string,
+  ) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.salesServiceUrl}/route-validator/frecuencia/summary`, {
+          params: { vendedor, batch_id }
+        }),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error getting frecuencia summary: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   @Get('route-validator/recorrido')
   async listRecorridos(
     @Query('limit') limit?: number,

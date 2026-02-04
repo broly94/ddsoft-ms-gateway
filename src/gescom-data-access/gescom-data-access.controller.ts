@@ -15,29 +15,19 @@ export class GescomController {
 
   @Get('sellers')
   async getSellers() {
-    this.logger.log(
-      `Gateway: Solicitando todos los vendedores a gescom-data-access.`,
-    );
-    // Aquí deberías definir los IDs de los supervisores que quieres consultar.
-    // Por ahora, usaremos un array de ejemplo.
-    // En una aplicación real, estos IDs podrían venir de un parámetro de ruta,
-    // de un cuerpo de solicitud, o de un servicio de autenticación/autorización.
-    const supervisorIds = [1, 5, 7]; // Ejemplo de IDs de supervisores
-
+    this.logger.log(`Gateway: Solicitando vendedores a gescom-data-access.`);
     try {
       const sellers = await firstValueFrom(
         this.client.send(
           { cmd: 'get_sellers_by_supervisors' },
-          { supervisorIds: supervisorIds },
+          {} // Enviamos vacío para obtener todos por defecto
         ),
       );
       this.logger.log(`Gateway: ${sellers ? sellers.length : 0} vendedores recibidos.`);
       return sellers;
     } catch (error) {
       this.logger.error('Error al obtener vendedores:', error);
-      throw new BadRequestException(
-        'Error al obtener vendedores de gescom-data-access.',
-      );
+      throw new BadRequestException('Error al obtener vendedores de gescom-data-access.');
     }
   }
 

@@ -14,7 +14,7 @@ async function bootstrap() {
 
   app.enableCors({
     origin: '*', // Para pruebas con Postman
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: false,
   });
 

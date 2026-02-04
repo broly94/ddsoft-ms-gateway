@@ -13,6 +13,7 @@ import {
   Query,
   Param,
   Put,
+  Patch,
   Delete,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
@@ -73,6 +74,44 @@ export class SalesController {
       throw new HttpException(
         'Sales service unavailable',
         HttpStatus.SERVICE_UNAVAILABLE,
+      );
+    }
+  }
+
+  @Post('route-validator/check-conflicts')
+  async checkConflicts(@Body() body: any) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.post(
+          `${this.salesServiceUrl}/route-validator/check-conflicts`,
+          body,
+        ),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error checking conflicts: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Post('route-validator/delete-by-date')
+  async deleteByDate(@Body() body: any) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.post(
+          `${this.salesServiceUrl}/route-validator/delete-by-date`,
+          body,
+        ),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error deleting by date: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -245,6 +284,22 @@ export class SalesController {
     }
   }
 
+  @Delete('route-validator/history/:batchId')
+  async deleteBatch(@Param('batchId') batchId: string) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.delete(`${this.salesServiceUrl}/route-validator/history/${batchId}`),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error deleting batch: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   @Get('route-validator/frecuencia/recent')
   async getRecentFrecuencia(
     @Query('limit') limit?: number,
@@ -272,16 +327,251 @@ export class SalesController {
   async getFrecuenciaSummary(
     @Query('vendedor') vendedor?: string,
     @Query('batch_id') batch_id?: string,
+    @Query('fecha_desde') fecha_desde?: string,
+    @Query('fecha_hasta') fecha_hasta?: string,
   ) {
     try {
       const response = await firstValueFrom(
         this.httpService.get(`${this.salesServiceUrl}/route-validator/frecuencia/summary`, {
-          params: { vendedor, batch_id }
+          params: { vendedor, batch_id, fecha_desde, fecha_hasta }
         }),
       );
       return response.data;
     } catch (error) {
       this.logger.error(`Error getting frecuencia summary: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('route-validator/horas/summary')
+  async getHorasSummary(
+    @Query('vendedor') vendedor?: string,
+    @Query('batch_id') batch_id?: string,
+    @Query('batch_ids') batch_ids?: string,
+    @Query('fecha_desde') fecha_desde?: string,
+    @Query('fecha_hasta') fecha_hasta?: string,
+  ) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.salesServiceUrl}/route-validator/horas/summary`, {
+          params: { vendedor, batch_id, batch_ids, fecha_desde, fecha_hasta }
+        }),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error getting horas summary: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('route-validator/horas/:vendedor/details')
+  async getHorasVendedorDetalleMulti(
+    @Param('vendedor') vendedor: string,
+    @Query('batch_id') batch_id?: string,
+    @Query('batch_ids') batch_ids?: string,
+  ) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.salesServiceUrl}/route-validator/horas/${vendedor}/details`, {
+          params: { batch_id, batch_ids }
+        }),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error getting horas vendedor details multi: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('route-validator/horas/:vendedor/:batchId/details')
+  async getHorasVendedorDetalle(
+    @Param('vendedor') vendedor: string,
+    @Param('batchId') batchId: string,
+  ) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.salesServiceUrl}/route-validator/horas/${vendedor}/${batchId}/details`),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error getting horas vendedor details: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('route-validator/horas/batches')
+  async getAvailableBatches() {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.salesServiceUrl}/route-validator/horas/batches`),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error getting available batches: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('route-validator/horas/manual')
+  async getHorasManual(
+    @Query('vendedor') vendedor?: string,
+    @Query('fecha_desde') fecha_desde?: string,
+    @Query('fecha_hasta') fecha_hasta?: string,
+  ) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.salesServiceUrl}/route-validator/horas/manual`, {
+          params: { vendedor, fecha_desde, fecha_hasta }
+        }),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error getting manual hours: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Post('route-validator/horas/manual')
+  async upsertHoraManual(@Body() body: any) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.post(`${this.salesServiceUrl}/route-validator/horas/manual`, body),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error upserting manual hour: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Delete('route-validator/horas/manual/:id')
+  async deleteHoraManual(@Param('id') id: string) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.delete(`${this.salesServiceUrl}/route-validator/horas/manual/${id}`),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error deleting manual hour: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Patch('route-validator/horas/:id/validez')
+  async updateHoraValidez(
+    @Param('id') id: string,
+    @Body() body: { es_valido: string },
+  ) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.patch(
+          `${this.salesServiceUrl}/route-validator/horas/${id}/validez`,
+          body,
+        ),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error updating hora validez: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('route-validator/horas/:vendedor/raw')
+  async getHorasRawDetails(
+    @Param('vendedor') vendedor: string,
+    @Query('fecha') fecha: string,
+    @Query('batch_ids') batch_ids?: string,
+  ) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.salesServiceUrl}/route-validator/horas/${vendedor}/raw`, {
+          params: { fecha, batch_ids }
+        }),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error getting raw hours details: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Post('route-validator/horas/split')
+  async splitHoraDetalle(@Body() body: any) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.post(
+          `${this.salesServiceUrl}/route-validator/horas/split`,
+          body,
+        ),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error splitting hours: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Post('route-validator/horas/split-raw')
+  async splitRawLogs(@Body() body: any) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.post(
+          `${this.salesServiceUrl}/route-validator/horas/split-raw`,
+          body,
+        ),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error splitting raw logs: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Patch('route-validator/horas/:id')
+  async updateHoraDetalle(@Param('id') id: string, @Body() body: any) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.patch(`${this.salesServiceUrl}/route-validator/horas/${id}`, body),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error updating hora detalle: ${error.message}`);
       throw new HttpException(
         error.response?.data?.detail || 'Internal server error',
         error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
@@ -373,6 +663,41 @@ export class SalesController {
       return response.data;
     } catch (error) {
       this.logger.error(`Error deleting recorrido: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('route-validator/vendedores')
+  async getVendedores() {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.salesServiceUrl}/route-validator/vendedores`),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error getting local vendedores: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Post('route-validator/vendedores/sync')
+  async syncVendedores(@Body() body: any) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.post(
+          `${this.salesServiceUrl}/route-validator/sync-vendedores`,
+          body,
+        ),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error syncing local vendedores: ${error.message}`);
       throw new HttpException(
         error.response?.data?.detail || 'Internal server error',
         error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,

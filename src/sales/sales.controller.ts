@@ -591,20 +591,26 @@ export class SalesController {
     @Query('dia') dia?: string,
   ) {
     try {
+      this.logger.log(`Listing recorridos: limit=${limit}, offset=${offset}, vendedor=${search_vendedor}`);
       const response = await firstValueFrom(
         this.httpService.get(`${this.salesServiceUrl}/route-validator/recorrido`, {
           params: { limit, offset, search_vendedor, search_cliente, linea, bloque, semana, dia }
         }),
       );
+      this.logger.log(`Recorridos received from sales-service: ${response.data?.items?.length} items, total: ${response.data?.total}`);
       return response.data;
     } catch (error) {
       this.logger.error(`Error listing recorridos: ${error.message}`);
+      if (error.response) {
+        this.logger.error(`Response data: ${JSON.stringify(error.response.data)}`);
+      }
       throw new HttpException(
         error.response?.data?.detail || 'Internal server error',
         error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
+
 
   @Get('route-validator/recorrido/:id')
   async getRecorrido(@Param('id') id: string) {
@@ -698,6 +704,60 @@ export class SalesController {
       return response.data;
     } catch (error) {
       this.logger.error(`Error syncing local vendedores: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Delete('route-validator/horas/raw-delete')
+  async deleteRawLogs(@Body() body: any) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.delete(
+          `${this.salesServiceUrl}/route-validator/horas/raw-delete`,
+          { data: body },
+        ),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error deleting raw logs: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('route-validator/viatico-config')
+  async getViaticoSettings() {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.salesServiceUrl}/route-validator/viatico-config`),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error getting viatico config: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Put('route-validator/viatico-config')
+  async updateViaticoSettings(@Body() body: any) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.put(
+          `${this.salesServiceUrl}/route-validator/viatico-config`,
+          body,
+        ),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error updating viatico config: ${error.message}`);
       throw new HttpException(
         error.response?.data?.detail || 'Internal server error',
         error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,

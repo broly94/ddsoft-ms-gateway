@@ -165,14 +165,14 @@ export class SalesController {
     const horario = files.horario?.[0];
     const recorrido = files.recorrido?.[0];
 
-    if (!horario)
-      throw new HttpException('Horario file is required', HttpStatus.BAD_REQUEST);
-
     const formData = new FormData();
-    formData.append('horario', horario.buffer, {
-      filename: horario.originalname,
-      contentType: horario.mimetype,
-    });
+    
+    if (horario) {
+      formData.append('horario', horario.buffer, {
+        filename: horario.originalname,
+        contentType: horario.mimetype,
+      });
+    }
 
     if (recorrido) {
       formData.append('recorrido', recorrido.buffer, {
@@ -339,6 +339,28 @@ export class SalesController {
       return response.data;
     } catch (error) {
       this.logger.error(`Error getting frecuencia summary: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('route-validator/horas-detalle')
+  async getHorasDetalle(
+    @Query('vendedor') vendedor: string,
+    @Query('fecha_desde') fecha_desde: string,
+    @Query('fecha_hasta') fecha_hasta: string,
+  ) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.salesServiceUrl}/route-validator/horas-detalle`, {
+          params: { vendedor, fecha_desde, fecha_hasta }
+        }),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error getting horas detalle: ${error.message}`);
       throw new HttpException(
         error.response?.data?.detail || 'Internal server error',
         error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
@@ -758,6 +780,25 @@ export class SalesController {
       return response.data;
     } catch (error) {
       this.logger.error(`Error updating viatico config: ${error.message}`);
+      throw new HttpException(
+        error.response?.data?.detail || 'Internal server error',
+        error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Post('route-validator/manual-override')
+  async manualOverride(@Body() body: any) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.post(
+          `${this.salesServiceUrl}/route-validator/manual-override`,
+          body,
+        ),
+      );
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error in manual override: ${error.message}`);
       throw new HttpException(
         error.response?.data?.detail || 'Internal server error',
         error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
